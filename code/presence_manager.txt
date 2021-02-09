@@ -19,9 +19,9 @@ definition(
     author: "Lukas Weier",
     description: "A SmartApp to manage multiple Modes for your home",
     category: "Convenience",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+    iconUrl: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png",
+    iconX2Url: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png",
+    iconX3Url: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png")
 
 
 preferences {
