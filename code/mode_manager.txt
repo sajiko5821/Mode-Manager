@@ -1,5 +1,5 @@
 /**
- *  Presence Manager
+ *  Mode Manager
  *
  *  Copyright 2021 Lukas Weier
  *
@@ -14,14 +14,14 @@
  *
  */
 definition(
-    name: "Presence Manager",
+    name: "Mode Manager",
     namespace: "sajiko5821",
     author: "Lukas Weier",
     description: "A SmartApp to manage multiple Modes for your home",
     category: "Convenience",
-    iconUrl: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png",
-    iconX2Url: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png",
-    iconX3Url: "https://raw.githubusercontent.com/sajiko5821/Presence-Manager/main/Icons/Presence_Manager_Icon_V1.png")
+    iconUrl: "https://raw.githubusercontent.com/sajiko5821/Mode-Manager/main/Icons/Presence_Manager_Icon_V1.png",
+    iconX2Url: "https://raw.githubusercontent.com/sajiko5821/Mode-Manager/main/Icons/Presence_Manager_Icon_V1.png",
+    iconX3Url: "https://raw.githubusercontent.com/sajiko5821/Mode-Manager/main/Icons/Presence_Manager_Icon_V1.png")
 
 
 preferences {
@@ -34,6 +34,11 @@ preferences {
         section("Day"){
         	input "dayMode", "mode", title: "Select Day Mode", required: true
             input "dayFrom", "time", title: "From", required: true
+      	}
+        
+        section("Evening"){
+        	input "eveningMode", "mode", title: "Select Evening Mode", required: true
+            input "eveningFrom", "time", title: "From", required: true
       	}
         
         section("Night"){
@@ -49,6 +54,10 @@ preferences {
         section("Away"){
         	input "awayMode", "mode", title: "Select Away Mode", required: true
             input "awaySensor", "capability.contactSensor", title: "Select Door Sensor", required: true
+        }
+        
+        section("Send Push Notification?"){
+        	input "sendPush", "bool", title: "Send Push Notofication when Mode is changed", required:false
         }
 	}
 }
@@ -69,6 +78,7 @@ def initialize() {
     subscribe(awaySensor, "contact.closed", doorClosedHandler)
     schedule(morningFrom, morningHandler)
     schedule(dayFrom, dayHandler)
+    schedule(eveningFrom, eveningHandler)
     schedule(nightFrom, nightHandler)
     schedule(midnightFrom, midnightHandler)
 }
@@ -76,51 +86,82 @@ def initialize() {
 def doorClosedHandler(evt){
 	setLocationMode("Away")
     log.debug "Location Mode Away"
+    if(sendPush){
+    	sendPush("Mode changed to Away")
+    }
 }
 
 def doorOpenHandler(evt){
 	def morningTime = timeOfDayBetween(morningFrom, dayFrom, new Date(), location.timeZone)
-    def dayTime = timeOfDayBetween(dayFrom, nightFrom, new Date(), location.timeZone)
+    def dayTime = timeOfDayBetween(dayFrom, eveningFromFrom, new Date(), location.timeZone)
+    def eveningHandler = timeOfDayBetween(eveningFrom, nightFrom, new Date(), location.timeZone)
     def nightTime = timeOfDayBetween(nightFrom, midnightFrom, new Date(), location.timeZone)
     def midnightTime = timeOfDayBetween(midnightFrom, morningFrom, new Date(), location.timeZone)
     
-    if(morningTime){
-    	morningHandler()
-    }
+    if(location.mode != "Away"){
     
-    if(dayTime){
-    	dayHandler()
-    }
-    
-    if(nightTime){
-    	nightHandler()
-    }
-    
-    if(midnightTime){
-    	midnightHandler()
-    }
-    
-    else{
-    	nightHandler()
-    }
+        if(morningTime){
+            morningHandler()
+        }
+
+        if(dayTime){
+            dayHandler()
+        }
+        
+        if(eveningTime){
+        	eveningHandler()
+        }
+
+        if(nightTime){
+            nightHandler()
+        }
+
+        if(midnightTime){
+            midnightHandler()
+        }
+
+        else{
+            nightHandler()
+        }
+   	}
 }
 
 def morningHandler(evt){
 	setLocationMode("Morning")
     log.debug "Location Mode Morning"
+    if(sendPush){
+    	sendPush("Mode changed to Morning")
+    }
 }
 
 def dayHandler(evt){
 	setLocationMode("Day")
     log.debug "Location Mode Day"
+    if(sendPush){
+    	sendPush("Mode changed to Day")
+    }
+}
+
+def eveningHandler(evt){
+	setLocationMode("Evening")
+    log.debug "Location Mode Evening"
+    if(sendPush){
+    	sendPush("Mode changed to Evening")
+    }
 }
 
 def nightHandler(evt){
 	setLocationMode("Night")
     log.debug "Location Mode Night"
+    if(sendPush){
+    	sendPush("Mode changed to Night")
+    }
 }
 
 def midnightHandler(evt){
 	setLocationMode("Midnight")
     log.debug "Location Mode Midnight"
+    if(sendPush){
+    	sendPush("Mode changed to Midnight")
+    }
 }
